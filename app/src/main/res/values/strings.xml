@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Activizer</string>
+    <string name="exercises">Exercises:</string>
+    <string name="high_tempo">High Tempo</string>
+    <string name="light_stepping">Light Stepping</string>
+    <string name="dance">Dance</string>
+</resources>
