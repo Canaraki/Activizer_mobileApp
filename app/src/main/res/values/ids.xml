@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="name_edit" type="id" />
+    <item name="mail_edit" type="id" />
+    <item name="age_edit" type="id" />
+    <item name="gender_edit" type="id" />
+    <item name="weight_edit" type="id" />
+    <item name="height_edit" type="id" />
+</resources> 
