@@ -81,7 +81,7 @@ class StatsPage : AppCompatActivity() {
         val dateFrom = dateFormat.format(calendar.time)
 
         // Create the request URL with date parameters
-        val url = "http://your-server-ip:5000/user/user-stats?dateFrom=$dateFrom&dateUntil=$dateUntil"
+        val url = "http://192.168.137.110:5000/user/user-stats?dateFrom=$dateFrom&dateUntil=$dateUntil"
 
         val requestQueue = Volley.newRequestQueue(this)
         val jsonObjectRequest = JsonObjectRequest(

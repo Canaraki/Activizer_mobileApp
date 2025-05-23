@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var danceButton: Button
 
     // Server configuration - to be updated with actual server IP
-    private val SERVER_IP = "192.168.1.100" // Replace with actual server IP
+    private val SERVER_IP = "192.168.137.110" // Replace with actual server IP
     private val SERVER_PORT = 5000
     private val BASE_URL = "http://$SERVER_IP:$SERVER_PORT"
 
@@ -68,19 +68,19 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
 
-            /* Activity button click listeners - Uncomment when server is ready
+            // Activity button click listeners - Uncomment when server is ready
             lightSteppingButton.setOnClickListener {
-                sendActivityRequest("light_stepping")
+                sendActivityRequest("stepping")
             }
 
             highTempoButton.setOnClickListener {
-                sendActivityRequest("high_tempo")
+                sendActivityRequest("tempo")
             }
 
             danceButton.setOnClickListener {
                 sendActivityRequest("dance")
             }
-            */
+
 
         } catch (e: Exception) {
             //e.printStackTrace()
@@ -88,45 +88,73 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* Network request function Uncomment when server is ready!!!
+    // Network request function
     private fun sendActivityRequest(activityType: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = URL("$BASE_URL/start_activity")
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "POST"
-                connection.setRequestProperty("Content-Type", "application/json")
-                connection.doOutput = true
+                // First, get the exercises for the selected type
+                val exercisesUrl = URL("$BASE_URL/api/exercises")
+                val exercisesConnection = exercisesUrl.openConnection() as HttpURLConnection
+                exercisesConnection.requestMethod = "POST"
+                exercisesConnection.setRequestProperty("Content-Type", "application/json")
+                exercisesConnection.doOutput = true
 
-                // Create JSON payload
-                val jsonPayload = """
+                // Create JSON payload for getting exercises
+                val exercisesPayload = """
                     {
-                        "activity_type": "$activityType",
-                        "timestamp": "${System.currentTimeMillis()}"
+                        "type": "$activityType"
                     }
                 """.trimIndent()
 
                 // Write payload to output stream
-                connection.outputStream.use { os ->
-                    os.write(jsonPayload.toByteArray())
+                exercisesConnection.outputStream.use { os ->
+                    os.write(exercisesPayload.toByteArray())
                     os.flush()
                 }
 
-                // Get response
-                val responseCode = connection.responseCode
-                val response = if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
+                // Get exercises response
+                val exercisesResponse = if (exercisesConnection.responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader(InputStreamReader(exercisesConnection.inputStream)).use { reader ->
                         reader.readText()
                     }
                 } else {
-                    "Error: $responseCode"
+                    "Error: ${exercisesConnection.responseCode}"
+                }
+
+                // Now send the exercise selection
+                val selectionUrl = URL("$BASE_URL/exercise-selection")
+                val selectionConnection = selectionUrl.openConnection() as HttpURLConnection
+                selectionConnection.requestMethod = "GET"
+                selectionConnection.setRequestProperty("Content-Type", "application/json")
+                selectionConnection.doOutput = true
+
+                // Create JSON payload for exercise selection
+                val selectionPayload = """
+                    {
+                        "text": "$activityType"
+                    }
+                """.trimIndent()
+
+                // Write payload to output stream
+                selectionConnection.outputStream.use { os ->
+                    os.write(selectionPayload.toByteArray())
+                    os.flush()
+                }
+
+                // Get selection response
+                val selectionResponse = if (selectionConnection.responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader(InputStreamReader(selectionConnection.inputStream)).use { reader ->
+                        reader.readText()
+                    }
+                } else {
+                    "Error: ${selectionConnection.responseCode}"
                 }
 
                 // Show response in UI thread
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         this@MainActivity,
-                        "Activity request sent: $activityType\nResponse: $response",
+                        "Activity request sent: $activityType\nExercises: $exercisesResponse\nSelection: $selectionResponse",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -142,5 +170,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    */
+    //*/
 }
