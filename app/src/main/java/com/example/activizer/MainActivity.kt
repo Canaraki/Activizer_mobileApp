@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var danceButton: Button
 
     // Server configuration - to be updated with actual server IP
-    private val SERVER_IP = "192.168.137.110" // Replace with actual server IP
+    private val SERVER_IP = "10.143.3.233" // Replace with actual server IP
     private val SERVER_PORT = 5000
     private val BASE_URL = "http://$SERVER_IP:$SERVER_PORT"
 
