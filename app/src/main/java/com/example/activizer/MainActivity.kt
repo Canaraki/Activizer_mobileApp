@@ -157,6 +157,22 @@ class MainActivity : AppCompatActivity() {
                         "Activity request sent: $activityType\nExercises: $exercisesResponse\nSelection: $selectionResponse",
                         Toast.LENGTH_LONG
                     ).show()
+                    if (activityType == "stepping") {
+                        val intent = Intent(this@MainActivity, LightSteppingActivity::class.java)
+                        //intent.putExtra("exercises", exercisesResponse)
+                        startActivity(intent)
+                    }
+                    if (activityType == "tempo") {
+                        val intent = Intent(this@MainActivity, HighTempoActivity::class.java)
+                        //intent.putExtra("exercises", exercisesResponse)
+                        startActivity(intent)
+                    }
+                    if (activityType == "dance") {
+                        val intent = Intent(this@MainActivity, DancingActivity::class.java)
+                        //intent.putExtra("exercises", exercisesResponse)
+                        startActivity(intent)
+                    }
+
                 }
 
             } catch (e: Exception) {
