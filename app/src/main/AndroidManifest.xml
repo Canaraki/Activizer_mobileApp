@@ -40,6 +40,10 @@
             android:name=".StatsPage"
             android:exported="false" />
 
+        <activity android:name=".LightSteppingActivity" />
+        <activity android:name=".HighTempoActivity" />
+        <activity android:name=".DancingActivity" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
