@@ -1,5 +1,6 @@
 package com.example.activizer
 
+import android.graphics.Color
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -7,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import org.json.JSONArray
 
 class LightSteppingActivity : AppCompatActivity() {
@@ -48,12 +50,36 @@ class LightSteppingActivity : AppCompatActivity() {
 
                 val btn = Button(this).apply {
                     text = routine
+                    textSize = 18f
+                    setTextColor(Color.WHITE)
+                    background = ContextCompat.getDrawable(this@LightSteppingActivity, R.drawable.rounded_button)
+                    setPadding(32, 24, 32, 24)
+                    setAllCaps(false)
+                    elevation = 8f
+
+                    // Set margins
+                    val layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    layoutParams.setMargins(0, 20, 0, 20)
+                    this.layoutParams = layoutParams
+
                     setOnClickListener {
                         Toast.makeText(this@LightSteppingActivity, "Selected: $routine", Toast.LENGTH_SHORT).show()
                     }
                 }
-
+                btn.translationY = 100f
+                btn.alpha = 0f
                 container.addView(btn)
+
+                btn.animate()
+                    .translationY(0f)
+                    .alpha(1f)
+                    .setDuration(400)
+                    .setStartDelay(i * 100L)
+                    .start()
+
             }
 
         } catch (e: Exception) {

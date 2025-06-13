@@ -8,6 +8,15 @@
     android:fadingEdgeLength="10dp"
     tools:context=".UserDetails">
 
+    <View
+        android:id="@+id/topColorBar"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:background="#6200EE"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <ImageButton
         android:id="@+id/home2"
         android:layout_width="109dp"
@@ -57,11 +66,12 @@
         android:layout_height="60dp"
         android:layout_marginStart="25dp"
         android:layout_marginTop="80dp"
-        android:background="#FFC107"
+        android:textColor="@color/white"
         android:backgroundTint="#8BC34A"
         android:fontFamily="@font/poppins_bold"
         android:foregroundTint="#FFFFFF"
         android:textAlignment="center"
+        android:paddingTop="20dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -70,10 +80,10 @@
 
     <FrameLayout
         android:id="@+id/info_frame"
-        android:layout_width="360dp"
-        android:layout_height="360dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="297dp"
+        android:layout_height="291dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="124dp"
         android:background="#8BC34A"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/User">

@@ -7,6 +7,8 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
+import androidx.core.content.ContextCompat
 
 class HighTempoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,12 +49,36 @@ class HighTempoActivity : AppCompatActivity() {
 
                 val btn = Button(this).apply {
                     text = routine
+                    textSize = 18f
+                    setTextColor(Color.WHITE)
+                    background = ContextCompat.getDrawable(this@HighTempoActivity, R.drawable.rounded_button)
+                    setPadding(32, 24, 32, 24)
+                    setAllCaps(false)
+                    elevation = 8f
+
+                    // Set margins
+                    val layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    layoutParams.setMargins(0, 20, 0, 20)
+                    this.layoutParams = layoutParams
+
                     setOnClickListener {
                         Toast.makeText(this@HighTempoActivity, "Selected: $routine", Toast.LENGTH_SHORT).show()
                     }
                 }
 
+                btn.translationY = 100f
+                btn.alpha = 0f
                 container.addView(btn)
+
+                btn.animate()
+                    .translationY(0f)
+                    .alpha(1f)
+                    .setDuration(400)
+                    .setStartDelay(i * 100L)
+                    .start()
             }
 
         } catch (e: Exception) {

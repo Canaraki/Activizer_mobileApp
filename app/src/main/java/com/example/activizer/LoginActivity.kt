@@ -67,6 +67,35 @@ class LoginActivity : AppCompatActivity() {
             showLoginForm()
         }
 
+        //animations
+
+        loginButton.alpha = 0f
+        loginButton.translationY = 100f
+        loginButton.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(600)
+            .setStartDelay(300)
+            .start()
+
+        skipLoginButton.alpha = 0f
+        skipLoginButton.translationY = 100f
+        skipLoginButton.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(600)
+            .setStartDelay(300)
+            .start()
+
+        titleText.alpha = 0f
+        titleText.translationY = -100f
+        titleText.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(600)
+            .setStartDelay(300)
+            .start()
+
         loginButton.setOnClickListener {
             val username = findViewById<TextInputEditText>(R.id.usernameInput).text.toString()
             val password = findViewById<TextInputEditText>(R.id.passwordInput).text.toString()
@@ -80,7 +109,7 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Waiting for server discovery...", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            
+
             login(username, password)
         }
 
