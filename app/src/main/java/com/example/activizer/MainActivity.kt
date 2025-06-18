@@ -28,10 +28,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var lightSteppingButton: Button
     private lateinit var highTempoButton: Button
     private lateinit var danceButton: Button
+    private var username: String? = null
 
-    private val SERVER_IP = "192.168.137.110"//IP address of Raspberry Pi on hotspot
-    private val SERVER_PORT = 5000
-    private val BASE_URL = "http://$SERVER_IP:$SERVER_PORT"
+    private val BASE_URL = "http://${ServerAddresses.RaspberryPiAddress}"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +53,13 @@ class MainActivity : AppCompatActivity() {
             highTempoButton = findViewById(id.highTempo)
             danceButton = findViewById(id.dance)
 
+            username = intent.getStringExtra("username")
+
             userButton.setOnClickListener {
                 val intent = Intent(this, UserDetails::class.java)
+                if (username != null) {
+                    intent.putExtra("username", username)
+                }
                 startActivity(intent)
             }
             homeButton.setOnClickListener {

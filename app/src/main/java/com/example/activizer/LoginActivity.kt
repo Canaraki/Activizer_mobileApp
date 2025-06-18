@@ -33,9 +33,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var skipLoginButton: Button
 
     // Server configuration
-    private var SERVER_IP: String? = "192.168.132.1"//IP address of laptop on hotspot
-    private var SERVER_PORT: Int? = 5000
-    private var BASE_URL = "http://$SERVER_IP:$SERVER_PORT"
+    private var BASE_URL = "http://${ServerAddresses.DatabaseAddress}"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,11 +99,6 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            
-            if (SERVER_IP == null || SERVER_PORT == null) {
-                Toast.makeText(this, "Waiting for server discovery...", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
 
             login(username, password)
         }
@@ -124,11 +117,6 @@ class LoginActivity : AppCompatActivity() {
                 email.isBlank() || age.isBlank() || gender.isBlank() || 
                 weight.isBlank() || height.isBlank()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (SERVER_IP == null || SERVER_PORT == null) {
-                Toast.makeText(this, "Waiting for server discovery...", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -220,6 +208,7 @@ class LoginActivity : AppCompatActivity() {
                         if (response.contains(" has successfully logged in")) {
                             // Login successful, navigate to main activity
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                            intent.putExtra("username", username)
                             startActivity(intent)
                             finish()
                         } else {

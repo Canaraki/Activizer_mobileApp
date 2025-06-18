@@ -2,7 +2,6 @@ package com.example.activizer
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -13,6 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UserDetails : AppCompatActivity() {
     private lateinit var userButton: ImageButton
@@ -36,7 +39,6 @@ class UserDetails : AppCompatActivity() {
     private lateinit var heightEditText: EditText
 
     private var isEditMode = false
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +50,12 @@ class UserDetails : AppCompatActivity() {
             insets
         }
 
-        // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("UserDetails", MODE_PRIVATE)
+        // Get username from Intent
+        val username = intent.getStringExtra("username") ?: ""
+        if (username.isEmpty()) {
+            finish()
+            return
+        }
 
         // Initialize navigation buttons
         userButton = findViewById(R.id.user2)
@@ -65,9 +71,6 @@ class UserDetails : AppCompatActivity() {
         genderTextView = findViewById(R.id.gender)
         weightTextView = findViewById(R.id.weight)
         heightTextView = findViewById(R.id.height)
-
-        // Load saved data
-        loadUserData()
 
         // Initialize EditTexts
         nameEditText = EditText(this).apply {
@@ -119,54 +122,105 @@ class UserDetails : AppCompatActivity() {
         // Set up click listeners
         userButton.setOnClickListener {
             val intent = Intent(this, UserDetails::class.java)
+            intent.putExtra("username", username)
             startActivity(intent)
         }
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("username", username)
             startActivity(intent)
         }
         statsButton.setOnClickListener {
             val intent = Intent(this, StatsPage::class.java)
+            intent.putExtra("username", username)
             startActivity(intent)
         }
 
         editButton.setOnClickListener {
-            toggleEditMode()
+            toggleEditMode(username)
+        }
+
+        // Fetch user data from server
+        fetchUserData(username)
+    }
+
+    private fun fetchUserData(username: String) {
+        val BASE_URL = "http://${ServerAddresses.DatabaseAddress}"
+        val url = "$BASE_URL/user/user-data"
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+                val responseCode = connection.responseCode
+                val response = if (responseCode == java.net.HttpURLConnection.HTTP_OK) {
+                    java.io.BufferedReader(java.io.InputStreamReader(connection.inputStream)).use { it.readText() }
+                } else {
+                    java.io.BufferedReader(java.io.InputStreamReader(connection.errorStream)).use { it.readText() }
+                }
+                val json = org.json.JSONObject(response)
+                if (json.getString("status") == "success") {
+                    val data = json.getJSONArray("data")
+                    // Correct order: userName, fullName, email, gender, age, weight, height
+                    val userName = data.optString(0, "")
+                    val fullName = data.optString(1, "")
+                    val email = data.optString(2, "")
+                    val gender = data.optString(3, "")
+                    val age = data.optString(4, "")
+                    val weight = data.optString(5, "")
+                    val height = data.optString(6, "")
+                    withContext(Dispatchers.Main) {
+                        // Greeting shows userName
+                        greetingTextView.text = if (userName.isNotEmpty()) "Hello, $userName" else "Hello"
+                        // Name field shows fullName
+                        nameTextView.text = fullName
+                        mailTextView.text = email
+                        ageTextView.text = age
+                        genderTextView.text = gender
+                        weightTextView.text = weight
+                        heightTextView.text = height
+                        // Also update EditTexts
+                        nameEditText.setText(fullName)
+                        mailEditText.setText(email)
+                        ageEditText.setText(age)
+                        genderEditText.setText(gender)
+                        weightEditText.setText(weight)
+                        heightEditText.setText(height)
+                        // Update label for age
+                        val ageBar = findViewById<TextView>(R.id.age_bar)
+                        ageBar?.text = "Age:"
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    greetingTextView.text = "Failed to load user data"
+                }
+            }
         }
     }
 
-    private fun loadUserData() {
-        val name = sharedPreferences.getString("name", "") ?: ""
-        val mail = sharedPreferences.getString("mail", "") ?: ""
-        val age = sharedPreferences.getString("age", "") ?: ""
-        val gender = sharedPreferences.getString("gender", "") ?: ""
-        val weight = sharedPreferences.getString("weight", "") ?: ""
-        val height = sharedPreferences.getString("height", "") ?: ""
-
-        nameTextView.text = name
-        mailTextView.text = mail
-        ageTextView.text = age
-        genderTextView.text = gender
-        weightTextView.text = weight
-        heightTextView.text = height
-
-        // Update greeting text
-        greetingTextView.text = if (name.isNotEmpty()) "Hello, $name" else "Hello"
-    }
-
-    private fun saveUserData() {
-        with(sharedPreferences.edit()) {
-            putString("name", nameTextView.text.toString())
-            putString("mail", mailTextView.text.toString())
-            putString("age", ageTextView.text.toString())
-            putString("gender", genderTextView.text.toString())
-            putString("weight", weightTextView.text.toString())
-            putString("height", heightTextView.text.toString())
-            apply()
+    private fun updateUserAttribute(username: String, attr: String, value: String) {
+        val BASE_URL = "http://${ServerAddresses.DatabaseAddress}"
+        val url = "$BASE_URL/user/edit-user"
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                val params = "userAttr=${attr}&attrVal=${value}"
+                connection.outputStream.use { os ->
+                    os.write(params.toByteArray())
+                    os.flush()
+                }
+                val responseCode = connection.responseCode
+                // Optionally handle response
+            } catch (_: Exception) {}
         }
     }
 
-    private fun toggleEditMode() {
+    private fun toggleEditMode(username: String) {
         isEditMode = !isEditMode
         if (isEditMode) {
             // Switch to edit mode
@@ -184,7 +238,7 @@ class UserDetails : AppCompatActivity() {
             weightEditText.visibility = android.view.View.VISIBLE
             heightEditText.visibility = android.view.View.VISIBLE
         } else {
-            // Switch to view mode
+            // Switch to view mode and update server
             nameTextView.text = nameEditText.text
             mailTextView.text = mailEditText.text
             ageTextView.text = ageEditText.text
@@ -192,10 +246,10 @@ class UserDetails : AppCompatActivity() {
             weightTextView.text = weightEditText.text
             heightTextView.text = heightEditText.text
 
-            // Save the data when switching back to view mode
-            saveUserData()
-            // Update greeting text
-            greetingTextView.text = "Hello, ${nameTextView.text}"
+            // Only update editable fields on server (weight, height, age)
+            updateUserAttribute(username, "weight", weightEditText.text.toString())
+            updateUserAttribute(username, "Height", heightEditText.text.toString())
+            updateUserAttribute(username, "age", ageEditText.text.toString())
 
             nameTextView.visibility = android.view.View.VISIBLE
             mailTextView.visibility = android.view.View.VISIBLE
