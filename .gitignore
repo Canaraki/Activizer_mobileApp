@@ -149,3 +149,6 @@ local.properties
 
 # Google/Firebase secrets
 google-services.json
+
+#misc.xml because annoying
+misc.xml
