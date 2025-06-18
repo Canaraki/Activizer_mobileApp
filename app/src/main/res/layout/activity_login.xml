@@ -7,15 +7,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp">
 
         <TextView
             android:id="@+id/titleText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login"
-            android:textSize="24sp"
+            android:layout_marginTop="100dp"
+            android:padding="24dp"
+            android:text="Welcome!"
+            android:textSize="48sp"
             android:textStyle="bold"
             android:gravity="center"
             android:layout_marginBottom="24dp"/>
@@ -52,23 +55,32 @@
                     android:inputType="textPassword"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Login"/>
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:text="Login"
+                android:textSize="24dp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#6200EE"
+                app:cornerRadius="18dp"
+                />
 
             <Button
                 android:id="@+id/skipLoginButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Skip Login"
+                android:textColor="#6200EE"
                 style="@style/Widget.MaterialComponents.Button.TextButton"/>
 
             <Button
                 android:id="@+id/switchToRegisterButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#6200EE"
                 android:text="New user? Register here"
                 style="@style/Widget.MaterialComponents.Button.TextButton"/>
         </LinearLayout>

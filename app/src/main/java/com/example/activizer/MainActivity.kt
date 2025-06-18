@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var danceButton: Button
 
     // Server configuration - to be updated with actual server IP
-    private val SERVER_IP = "10.143.3.233" // Replace with actual server IP
+    private val SERVER_IP = "192.168.0.104" // Replace with actual server IP
     private val SERVER_PORT = 5000
     private val BASE_URL = "http://$SERVER_IP:$SERVER_PORT"
 
@@ -157,6 +157,23 @@ class MainActivity : AppCompatActivity() {
                         "Activity request sent: $activityType\nExercises: $exercisesResponse\nSelection: $selectionResponse",
                         Toast.LENGTH_LONG
                     ).show()
+                    if (activityType == "stepping") {
+                        Log.d("ResponseDebug", "Exercises JSON: $exercisesResponse")
+                        val intent = Intent(this@MainActivity, LightSteppingActivity::class.java)
+                        intent.putExtra("exercises", exercisesResponse)
+                        startActivity(intent)
+                    }
+                    if (activityType == "tempo") {
+                        val intent = Intent(this@MainActivity, HighTempoActivity::class.java)
+                        intent.putExtra("exercises", exercisesResponse)
+                        startActivity(intent)
+                    }
+                    if (activityType == "dance") {
+                        val intent = Intent(this@MainActivity, DancingActivity::class.java)
+                        intent.putExtra("exercises", exercisesResponse)
+                        startActivity(intent)
+                    }
+
                 }
 
             } catch (e: Exception) {
