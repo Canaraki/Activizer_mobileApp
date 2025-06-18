@@ -31,18 +31,15 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginButton: Button
     private lateinit var registerButton: Button
     private lateinit var skipLoginButton: Button
-    // private lateinit var nsdHelper: NsdHelper
 
     // Server configuration
-    private var SERVER_IP: String? = "10.0.2.2"
+    private var SERVER_IP: String? = "192.168.132.1"//IP address of laptop on hotspot
     private var SERVER_PORT: Int? = 5000
-    private var BASE_URL: String? = "http://10.0.2.2:5000"
+    private var BASE_URL = "http://$SERVER_IP:$SERVER_PORT"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
-        // Network service discovery is disabled. Server address is set to localhost:5000 by default.
 
         // Initialize views
         loginForm = findViewById(R.id.loginForm)
@@ -145,10 +142,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // override fun onDestroy() {
-    //     super.onDestroy()
-    //     nsdHelper.tearDown()
-    // }
 
     private fun showRegisterForm() {
         loginForm.visibility = View.GONE
