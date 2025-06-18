@@ -201,22 +201,35 @@ class UserDetails : AppCompatActivity() {
         }
     }
 
-    private fun updateUserAttribute(username: String, attr: String, value: String) {
+    private fun updateUserAttributesJson(username: String, weight: String, height: String, age: String) {
         val BASE_URL = "http://${ServerAddresses.DatabaseAddress}"
         val url = "$BASE_URL/user/edit-user"
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
                 connection.requestMethod = "POST"
+                connection.setRequestProperty("Content-Type", "application/json")
                 connection.doOutput = true
-                val params = "userAttr=${attr}&attrVal=${value}"
+                val json = org.json.JSONObject().apply {
+                    put("weight", weight)
+                    put("height", height)
+                    put("age", age)
+                    put("userName", username)
+                }
                 connection.outputStream.use { os ->
-                    os.write(params.toByteArray())
+                    os.write(json.toString().toByteArray())
                     os.flush()
                 }
                 val responseCode = connection.responseCode
-                // Optionally handle response
-            } catch (_: Exception) {}
+                val response = if (responseCode == java.net.HttpURLConnection.HTTP_OK) {
+                    java.io.BufferedReader(java.io.InputStreamReader(connection.inputStream)).use { it.readText() }
+                } else {
+                    java.io.BufferedReader(java.io.InputStreamReader(connection.errorStream)).use { it.readText() }
+                }
+                android.util.Log.d("editresponse", "Response code: $responseCode, body: $response")
+            } catch (e: Exception) {
+                android.util.Log.d("editresponse", "Exception: ${e.message}")
+            }
         }
     }
 
@@ -246,10 +259,8 @@ class UserDetails : AppCompatActivity() {
             weightTextView.text = weightEditText.text
             heightTextView.text = heightEditText.text
 
-            // Only update editable fields on server (weight, height, age)
-            updateUserAttribute(username, "weight", weightEditText.text.toString())
-            updateUserAttribute(username, "Height", heightEditText.text.toString())
-            updateUserAttribute(username, "age", ageEditText.text.toString())
+            // Send all updated fields as JSON
+            updateUserAttributesJson(username, weightEditText.text.toString(), heightEditText.text.toString(), ageEditText.text.toString())
 
             nameTextView.visibility = android.view.View.VISIBLE
             mailTextView.visibility = android.view.View.VISIBLE
