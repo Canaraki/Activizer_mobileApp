@@ -152,8 +152,8 @@ google-services.json
 
 #annoying auto generated files
 .idea/misc.xml
-.gradle/buildOutputCleanup/
-.gradle/file-system.probe
-.gradle/8.10.2/fileHashes/
-.gradle/8.10.2/executionHistory/
 .idea/workspace.xml
+.gradle/file-system.probe
+.gradle/buildOutputCleanup/**
+.gradle/8.10.2/fileHashes/**
+.gradle/8.10.2/executionHistory/**
