@@ -150,5 +150,14 @@ local.properties
 # Google/Firebase secrets
 google-services.json
 
-#misc.xml because annoying
+#annoying auto generated files
 misc.xml
+buildOutputCleanup.lock
+executionHistory.bin
+executionHistory.lock
+file-system.probe
+fileHashes.bin
+fileHashes.lock
+outputFiles.bin
+resourceHashesCache.bin
+workspace.xml
