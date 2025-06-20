@@ -64,10 +64,16 @@ class MainActivity : AppCompatActivity() {
             }
             homeButton.setOnClickListener {
                 val intent = Intent(this, MainActivity::class.java)
+                if (username != null) {
+                    intent.putExtra("username", username)
+                }
                 startActivity(intent)
             }
             statsButton.setOnClickListener{
                 val intent = Intent(this, StatsPage::class.java)
+                if (username != null) {
+                    intent.putExtra("username", username)
+                }
                 startActivity(intent)
             }
 

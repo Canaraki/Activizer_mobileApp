@@ -25,6 +25,7 @@ class StatsPage : AppCompatActivity() {
     private lateinit var statsButton: ImageButton
     private lateinit var statsRecyclerView: RecyclerView
     private lateinit var statsAdapter: StatsAdapter
+    private var username: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,7 @@ class StatsPage : AppCompatActivity() {
             insets
         }
 
+        username = intent.getStringExtra("username")
         try {
             setupNavigationButtons()
             setupRecyclerView()
@@ -52,14 +54,23 @@ class StatsPage : AppCompatActivity() {
 
         userButton.setOnClickListener {
             val intent = Intent(this, UserDetails::class.java)
+            if (username != null) {
+                intent.putExtra("username", username)
+            }
             startActivity(intent)
         }
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            if (username != null) {
+                intent.putExtra("username", username)
+            }
             startActivity(intent)
         }
         statsButton.setOnClickListener {
             val intent = Intent(this, StatsPage::class.java)
+            if (username != null) {
+                intent.putExtra("username", username)
+            }
             startActivity(intent)
         }
     }

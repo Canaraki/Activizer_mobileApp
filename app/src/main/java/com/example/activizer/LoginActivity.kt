@@ -274,20 +274,20 @@ class LoginActivity : AppCompatActivity() {
                     BufferedReader(InputStreamReader(connection.errorStream)).use { it.readText() }
                 }
 
-                // Print response details
-                Log.d("LoginActivity", "Response code: $responseCode")
-                Log.d("LoginActivity", "Response body: $response")
+                // Log server response
+                Log.d("registerresponse", "Response code: $responseCode, body: $response")
 
                 val jsonResponse = JSONObject(response)
                 withContext(Dispatchers.Main) {
                     if (jsonResponse.getString("status") == "success") {
-                        Toast.makeText(this@LoginActivity, 
-                            "Registration successful! Please login.", 
-                            Toast.LENGTH_LONG).show()
-                        showLoginForm()
+                        // Registration successful, go to main page and set username
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        intent.putExtra("username", username)
+                        startActivity(intent)
+                        finish()
                     } else {
                         Toast.makeText(this@LoginActivity, 
-                            jsonResponse.getString("message"), 
+                            jsonResponse.optString("message", "Registration failed."), 
                             Toast.LENGTH_LONG).show()
                     }
                 }
