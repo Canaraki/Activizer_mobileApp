@@ -7,4 +7,4 @@ object ServerAddresses {
 
     // Rig server (Raspberry Pi)(Flask)
     const val RaspberryPiAddress = "192.168.137.110:5000"
-} 
+}

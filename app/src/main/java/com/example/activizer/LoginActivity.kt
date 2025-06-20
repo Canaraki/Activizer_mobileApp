@@ -1,5 +1,6 @@
 package com.example.activizer
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -131,12 +132,14 @@ class LoginActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun showRegisterForm() {
         loginForm.visibility = View.GONE
         registerForm.visibility = View.VISIBLE
         titleText.text = "Register"
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showLoginForm() {
         registerForm.visibility = View.GONE
         loginForm.visibility = View.VISIBLE
@@ -206,9 +209,9 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
                         if (response.contains(" has successfully logged in")) {
-                            // Login successful, navigate to main activity
+                            // Login successful, set global username and navigate to main activity
+                            GlobalUser.username = username
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                            intent.putExtra("username", username)
                             startActivity(intent)
                             finish()
                         } else {
@@ -280,11 +283,8 @@ class LoginActivity : AppCompatActivity() {
                 val jsonResponse = JSONObject(response)
                 withContext(Dispatchers.Main) {
                     if (jsonResponse.getString("status") == "success") {
-                        // Registration successful, go to main page and set username
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                        intent.putExtra("username", username)
-                        startActivity(intent)
-                        finish()
+                        // Registration successful, now login automatically
+                        loginAfterRegistration(username, password)
                     } else {
                         Toast.makeText(this@LoginActivity, 
                             jsonResponse.optString("message", "Registration failed."), 
@@ -296,6 +296,82 @@ class LoginActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@LoginActivity, 
                         "Error: ${e.message}", 
+                        Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun loginAfterRegistration(username: String, password: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val reqParam = URLEncoder.encode("userName", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8") +
+                        "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8")
+                val url = URL("$BASE_URL/login")
+                Log.d("LoginActivity", "Sending login request to: $url")
+                Log.d("LoginActivity", "Request parameters: $reqParam")
+                with(url.openConnection() as HttpURLConnection) {
+                    requestMethod = "POST"
+                    doOutput = true
+                    doInput = true
+                    setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+                    setRequestProperty("Accept", "application/json")
+                    setRequestProperty("Connection", "close")
+                    connectTimeout = 5000
+                    readTimeout = 5000
+                    OutputStreamWriter(outputStream).use { writer ->
+                        writer.write(reqParam)
+                        writer.flush()
+                    }
+                    val responseCode = responseCode
+                    Log.d("LoginActivity", "Response code: $responseCode")
+                    val response = try {
+                        val responseText = if (responseCode == HttpURLConnection.HTTP_OK) {
+                            BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                                val response = StringBuffer()
+                                var inputLine = reader.readLine()
+                                while (inputLine != null) {
+                                    response.append(inputLine)
+                                    inputLine = reader.readLine()
+                                }
+                                response.toString()
+                            }
+                        } else {
+                            BufferedReader(InputStreamReader(errorStream)).use { reader ->
+                                val response = StringBuffer()
+                                var inputLine = reader.readLine()
+                                while (inputLine != null) {
+                                    response.append(inputLine)
+                                    inputLine = reader.readLine()
+                                }
+                                response.toString()
+                            }
+                        }
+                        Log.d("LoginActivity", "Response: $responseText")
+                        responseText
+                    } catch (e: Exception) {
+                        Log.e("LoginActivity", "Error reading response: ${e.message}", e)
+                        throw e
+                    }
+                    withContext(Dispatchers.Main) {
+                        if (response.contains(" has successfully logged in")) {
+                            // Login successful, set global username and navigate to main activity
+                            GlobalUser.username = username
+                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Toast.makeText(this@LoginActivity,
+                                "Login after registration failed. Please try logging in.",
+                                Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("LoginActivity", "Error during login after registration: ${e.message}", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@LoginActivity,
+                        "Error: ${e.message}",
                         Toast.LENGTH_LONG).show()
                 }
             }

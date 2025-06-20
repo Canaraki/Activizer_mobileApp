@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var lightSteppingButton: Button
     private lateinit var highTempoButton: Button
     private lateinit var danceButton: Button
-    private var username: String? = null
 
     private val BASE_URL = "http://${ServerAddresses.RaspberryPiAddress}"
 
@@ -53,27 +52,16 @@ class MainActivity : AppCompatActivity() {
             highTempoButton = findViewById(id.highTempo)
             danceButton = findViewById(id.dance)
 
-            username = intent.getStringExtra("username")
-
             userButton.setOnClickListener {
                 val intent = Intent(this, UserDetails::class.java)
-                if (username != null) {
-                    intent.putExtra("username", username)
-                }
                 startActivity(intent)
             }
             homeButton.setOnClickListener {
                 val intent = Intent(this, MainActivity::class.java)
-                if (username != null) {
-                    intent.putExtra("username", username)
-                }
                 startActivity(intent)
             }
             statsButton.setOnClickListener{
                 val intent = Intent(this, StatsPage::class.java)
-                if (username != null) {
-                    intent.putExtra("username", username)
-                }
                 startActivity(intent)
             }
 
@@ -89,7 +77,6 @@ class MainActivity : AppCompatActivity() {
             danceButton.setOnClickListener {
                 sendActivityRequest("dance")
             }
-
 
         } catch (e: Exception) {
             //e.printStackTrace()
@@ -182,7 +169,6 @@ class MainActivity : AppCompatActivity() {
                         intent.putExtra("exercises", exercisesResponse)
                         startActivity(intent)
                     }
-
                 }
 
             } catch (e: Exception) {

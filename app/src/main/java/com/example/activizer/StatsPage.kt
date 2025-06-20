@@ -37,7 +37,7 @@ class StatsPage : AppCompatActivity() {
             insets
         }
 
-        username = intent.getStringExtra("username")
+        username = GlobalUser.username
         try {
             setupNavigationButtons()
             setupRecyclerView()
@@ -54,23 +54,14 @@ class StatsPage : AppCompatActivity() {
 
         userButton.setOnClickListener {
             val intent = Intent(this, UserDetails::class.java)
-            if (username != null) {
-                intent.putExtra("username", username)
-            }
             startActivity(intent)
         }
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-            if (username != null) {
-                intent.putExtra("username", username)
-            }
             startActivity(intent)
         }
         statsButton.setOnClickListener {
             val intent = Intent(this, StatsPage::class.java)
-            if (username != null) {
-                intent.putExtra("username", username)
-            }
             startActivity(intent)
         }
     }

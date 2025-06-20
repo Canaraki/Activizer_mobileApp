@@ -3,7 +3,6 @@ package com.example.activizer
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -50,8 +49,8 @@ class UserDetails : AppCompatActivity() {
             insets
         }
 
-        // Get username from Intent
-        val username = intent.getStringExtra("username") ?: ""
+        // Get username from global variable
+        val username = GlobalUser.username ?: ""
         if (username.isEmpty()) {
             finish()
             return
@@ -122,17 +121,14 @@ class UserDetails : AppCompatActivity() {
         // Set up click listeners
         userButton.setOnClickListener {
             val intent = Intent(this, UserDetails::class.java)
-            intent.putExtra("username", username)
             startActivity(intent)
         }
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("username", username)
             startActivity(intent)
         }
         statsButton.setOnClickListener {
             val intent = Intent(this, StatsPage::class.java)
-            intent.putExtra("username", username)
             startActivity(intent)
         }
 
@@ -141,10 +137,11 @@ class UserDetails : AppCompatActivity() {
         }
 
         // Fetch user data from server
-        fetchUserData(username)
+        fetchUserData()
     }
 
-    private fun fetchUserData(username: String) {
+    @SuppressLint("SetTextI18n")
+    private fun fetchUserData() {
         val BASE_URL = "http://${ServerAddresses.DatabaseAddress}"
         val url = "$BASE_URL/user/user-data"
         CoroutineScope(Dispatchers.IO).launch {
