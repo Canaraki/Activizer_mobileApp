@@ -2,6 +2,7 @@ package com.example.activizer
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -17,6 +18,9 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HighTempoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,6 +82,8 @@ class HighTempoActivity : AppCompatActivity() {
                             try {
                                 val url = URL("$BASE_URL/exercise-selection")
                                 val connection = url.openConnection() as HttpURLConnection
+                                connection.readTimeout = 120000 // 2 minutes for exercise
+                                connection.connectTimeout = 15000 // 15 seconds
                                 connection.requestMethod = "POST"
                                 connection.setRequestProperty("Content-Type", "application/json")
                                 connection.doOutput = true
@@ -96,7 +102,66 @@ class HighTempoActivity : AppCompatActivity() {
                                     BufferedReader(InputStreamReader(connection.errorStream)).use { it.readText() }
                                 }
                                 withContext(Dispatchers.Main) {
-                                    Toast.makeText(this@HighTempoActivity, "Server: $response", Toast.LENGTH_LONG).show()
+                                    Log.d("tag:exerciseStats", "Raw Pi server response: $response")
+                                    try {
+                                        val jsonResponse = org.json.JSONObject(response)
+                                        val stat = jsonResponse.getDouble("stat").toFloat()
+                                        val intervalJsonArray = jsonResponse.getJSONArray("interval")
+                                        val interval = List(intervalJsonArray.length()) { i ->
+                                            intervalJsonArray.getDouble(i).toFloat()
+                                        }
+                                        val duration = jsonResponse.getDouble("duration").toFloat()
+                                        val exercise = jsonResponse.getString("exercise")
+
+                                        Log.d("tag:exerciseStats", "Received exercise stats. Exercise: $exercise, Stat: $stat, Duration: $duration, Intervals: ${interval.joinToString(", ")}")
+
+                                        // Send stats to the database server
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            try {
+                                                val dbUrl = URL("http://${ServerAddresses.DatabaseAddress}/user/user-stats")
+                                                val dbConnection = dbUrl.openConnection() as HttpURLConnection
+                                                dbConnection.requestMethod = "POST"
+                                                dbConnection.setRequestProperty("Content-Type", "application/json; utf-8")
+                                                dbConnection.doOutput = true
+
+                                                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                                val currentDate = sdf.format(Date())
+
+                                                val jsonPayload = """
+                                                    {
+                                                        "statDate": "$currentDate",
+                                                        "score": $stat,
+                                                        "exercise": "$exercise"
+                                                    }
+                                                """.trimIndent()
+
+                                                dbConnection.outputStream.use { os ->
+                                                    os.write(jsonPayload.toByteArray(Charsets.UTF_8))
+                                                }
+
+                                                val dbResponse = if (dbConnection.responseCode == HttpURLConnection.HTTP_OK) {
+                                                    BufferedReader(InputStreamReader(dbConnection.inputStream, "utf-8")).use { it.readText() }
+                                                } else {
+                                                    BufferedReader(InputStreamReader(dbConnection.errorStream, "utf-8")).use { it.readText() }
+                                                }
+
+                                                withContext(Dispatchers.Main) {
+                                                    Toast.makeText(this@HighTempoActivity, "Database: $dbResponse", Toast.LENGTH_LONG).show()
+                                                    Log.d("tag:exerciseStats", "Database Server Response: $dbResponse")
+                                                }
+                                            } catch (e: Exception) {
+                                                withContext(Dispatchers.Main) {
+                                                    val errorMessage = "Database server error: ${e.message}"
+                                                    Toast.makeText(this@HighTempoActivity, errorMessage, Toast.LENGTH_LONG).show()
+                                                    Log.e("tag:exerciseStats", errorMessage)
+                                                }
+                                            }
+                                        }
+                                    } catch (e: org.json.JSONException) {
+                                        val errorMessage = "Error parsing Pi server response: ${e.message}"
+                                        Toast.makeText(this@HighTempoActivity, errorMessage, Toast.LENGTH_LONG).show()
+                                        Log.e("tag:exerciseStats", errorMessage)
+                                    }
                                 }
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
