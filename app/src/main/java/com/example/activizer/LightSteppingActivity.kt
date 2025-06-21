@@ -115,6 +115,13 @@ class LightSteppingActivity : AppCompatActivity() {
 
                                         Log.d("tag:exerciseStats", "Received exercise stats. Exercise: $exercise, Stat: $stat, Duration: $duration, Intervals: ${interval.joinToString(", ")}")
 
+                                        val intent = Intent(this@LightSteppingActivity, ResultPopupActivity::class.java)
+                                        intent.putExtra("duration", duration)
+                                        intent.putExtra("score", stat)
+                                        intent.putExtra("steps", interval.toFloatArray())
+                                        startActivity(intent)
+
+
                                         // Send stats to the database server
                                         CoroutineScope(Dispatchers.IO).launch {
                                             try {

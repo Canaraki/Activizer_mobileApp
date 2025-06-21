@@ -38,6 +38,8 @@
         <!-- ✅ KULLANILAN SAYFALAR -->
         <activity android:name=".ExerciseSelectionActivity" android:exported="true" />
         <activity android:name=".ExerciseStatsActivity" android:exported="true" />
+        <activity android:name=".ResultPopupActivity" />
+
 
         <!-- ⛔ GEREKSİZ SATIR SİLİNDİ
         <activity android:name=".StatsPage" android:exported="false" />

@@ -114,6 +114,13 @@ class DancingActivity : AppCompatActivity(){
 
                                         Log.d("tag:exerciseStats", "Received exercise stats. Exercise: $exercise, Stat: $stat, Duration: $duration, Intervals: ${interval.joinToString(", ")}")
 
+                                        val intent = Intent(this@DancingActivity, ResultPopupActivity::class.java)
+                                        intent.putExtra("duration", duration)
+                                        intent.putExtra("score", 1/stat)
+                                        intent.putExtra("steps", interval.toFloatArray())
+                                        startActivity(intent)
+
+
                                         // Send stats to the database server
                                         CoroutineScope(Dispatchers.IO).launch {
                                             try {
