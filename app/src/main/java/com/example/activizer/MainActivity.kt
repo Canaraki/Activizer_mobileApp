@@ -60,10 +60,13 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
             }
-            statsButton.setOnClickListener{
-                val intent = Intent(this, StatsPage::class.java)
+            statsButton.setOnClickListener {
+                Toast.makeText(this, "İstatistik butonuna basıldı", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, ExerciseSelectionActivity::class.java)
                 startActivity(intent)
             }
+
 
             // Activity button click listeners - Uncomment when server is ready
             lightSteppingButton.setOnClickListener {

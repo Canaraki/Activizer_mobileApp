@@ -128,7 +128,7 @@ class UserDetails : AppCompatActivity() {
             startActivity(intent)
         }
         statsButton.setOnClickListener {
-            val intent = Intent(this, StatsPage::class.java)
+            val intent = Intent(this, ExerciseSelectionActivity::class.java)
             startActivity(intent)
         }
 

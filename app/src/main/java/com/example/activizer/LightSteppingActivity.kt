@@ -33,7 +33,7 @@ class LightSteppingActivity : AppCompatActivity() {
         val userButton = findViewById<ImageButton>(R.id.user)
 
         statsButton.setOnClickListener {
-            val intent = Intent(this, StatsPage::class.java)
+            val intent = Intent(this, ExerciseSelectionActivity::class.java)
             startActivity(intent)
         }
 

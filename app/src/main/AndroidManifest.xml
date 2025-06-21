@@ -19,7 +19,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -29,26 +28,20 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true">
-        </activity>
-
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-            
-        <activity
-            android:name=".UserDetails"
-            android:exported="false" />
-            
-        <activity
-            android:name=".StatsPage"
-            android:exported="false" />
-
+        <activity android:name=".LoginActivity" android:exported="true" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".UserDetails" android:exported="false" />
         <activity android:name=".LightSteppingActivity" />
         <activity android:name=".HighTempoActivity" />
         <activity android:name=".DancingActivity" />
+
+        <!-- ✅ KULLANILAN SAYFALAR -->
+        <activity android:name=".ExerciseSelectionActivity" android:exported="false" />
+        <activity android:name=".ExerciseStatsActivity" android:exported="false" />
+
+        <!-- ⛔ GEREKSİZ SATIR SİLİNDİ
+        <activity android:name=".StatsPage" android:exported="false" />
+        -->
 
         <meta-data
             android:name="preloaded_fonts"

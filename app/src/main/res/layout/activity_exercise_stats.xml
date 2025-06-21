@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ExerciseStatsActivity">
+
+    <LinearLayout
+        android:id="@+id/mainLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/exerciseTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exercise Name"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:paddingBottom="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingBottom="12dp">
+
+            <Button
+                android:id="@+id/startDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start Date" />
+
+            <Button
+                android:id="@+id/endDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="End Date"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/lastExerciseHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Last Exercise"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/lastExerciseDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duration: -"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/lastExerciseMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MSG: -"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/overallAverageMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Average MSG: -"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:layout_marginTop="12dp" />
+    </LinearLayout>
+</ScrollView>

@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven("https://jitpack.io") // 🔥 BURAYI EKLEDİK
     }
 }
 dependencyResolutionManagement {
@@ -16,8 +17,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io") // 🔥 BURAYI DA EKLEDİK
     }
 }
+
+
 
 rootProject.name = "Activizer"
 include(":app")
