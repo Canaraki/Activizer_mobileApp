@@ -3,6 +3,7 @@ package com.example.activizer
 import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -69,31 +70,40 @@ class ExerciseStatsActivity : AppCompatActivity() {
     private fun fetchDataFromServer() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = URL("http://${ServerAddresses.DatabaseAddress}/user/user-stats")
+                val url = URL("http://${ServerAddresses.DatabaseAddress}/user/fetch-stats")
                 val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
+                connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/json")
-                connection.doInput = true
+                connection.doOutput = true
+
+                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val requestJson = JSONObject().apply {
+                    put("dateFrom", sdf.format(startDate))
+                    put("dateUntil", sdf.format(endDate))
+                }
+                Log.d("fetchData", "Request JSON: ${requestJson.toString()}")
+
+                val outputBytes = requestJson.toString().toByteArray(Charsets.UTF_8)
+                connection.outputStream.write(outputBytes)
 
                 val response = connection.inputStream.bufferedReader().use { it.readText() }
+                Log.d("fetchData", "Raw JSON response: $response")
 
                 val statsList = mutableListOf<ExerciseStats>()
                 val json = JSONObject(response)
+                Log.d("fetchData", "Parsed JSONObject: $json")
                 val statsArray = json.getJSONArray("message")
+                Log.d("fetchData", "Stats array: $statsArray")
 
                 for (i in 0 until statsArray.length()) {
                     val item = statsArray.getJSONArray(i)
-                    val username = item.getString(0)
-                    val score = item.getDouble(1).toFloat()
-                    val date = item.getString(2)
-                    val exerciseName = item.getString(3)
-
-                    if (exerciseName == selectedExercise) {
-                        statsList.add(ExerciseStats(exerciseName, date, duration = 0, score = score))
-                    }
+                    val score = item.getDouble(0).toFloat()
+                    val date = item.getString(1)
+                    statsList.add(ExerciseStats(selectedExercise, date, score = score))
                 }
 
                 allStats = statsList
+                Log.d("fetchData", "Parsed stats list: $allStats")
 
                 withContext(Dispatchers.Main) {
                     updateUI()
@@ -131,8 +141,8 @@ class ExerciseStatsActivity : AppCompatActivity() {
         val last = filtered.lastOrNull()
         last?.let {
             lastExerciseHeader.text = "Last Exercise"
-            lastExerciseDuration.text = "Duration: ${it.duration} sec"
-            lastExerciseMsg.text = "MSG (sec/step): %.2f".format(it.score)
+
+            lastExerciseMsg.text = "exercise score (step/sec): %.2f".format(1/it.score)
         }
 
         val labels = filtered.map { it.exerciseDate }

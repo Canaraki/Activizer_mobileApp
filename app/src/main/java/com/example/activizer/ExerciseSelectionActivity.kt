@@ -33,7 +33,7 @@ class ExerciseSelectionActivity : AppCompatActivity() {
     private fun fetchExerciseNamesFromServer() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = URL("http://${ServerAddresses.DatabaseAddress}/user/user-stats")
+                val url = URL("http://${ServerAddresses.RaspberryPiAddress}/user/exercise-names")//route correct, check server code
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.setRequestProperty("Content-Type", "application/json")
@@ -46,11 +46,10 @@ class ExerciseSelectionActivity : AppCompatActivity() {
                     throw Exception("Server response error: ${json.getString("message")}")
                 }
 
-                val statsArray = json.getJSONArray("message")
+                val exercisesArray = json.getJSONArray("exercises")
                 val namesSet = mutableSetOf<String>()
-                for (i in 0 until statsArray.length()) {
-                    val statRow = statsArray.getJSONArray(i)
-                    val exerciseName = statRow.getString(3) // 4. sütun: exerciseName
+                for (i in 0 until exercisesArray.length()) {
+                    val exerciseName = exercisesArray.getString(i) //
                     namesSet.add(exerciseName)
                 }
 
