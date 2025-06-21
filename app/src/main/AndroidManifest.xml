@@ -36,8 +36,8 @@
         <activity android:name=".DancingActivity" />
 
         <!-- ✅ KULLANILAN SAYFALAR -->
-        <activity android:name=".ExerciseSelectionActivity" android:exported="false" />
-        <activity android:name=".ExerciseStatsActivity" android:exported="false" />
+        <activity android:name=".ExerciseSelectionActivity" android:exported="true" />
+        <activity android:name=".ExerciseStatsActivity" android:exported="true" />
 
         <!-- ⛔ GEREKSİZ SATIR SİLİNDİ
         <activity android:name=".StatsPage" android:exported="false" />

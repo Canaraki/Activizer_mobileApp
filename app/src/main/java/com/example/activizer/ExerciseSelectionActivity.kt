@@ -1,61 +1,20 @@
-
 package com.example.activizer
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
-
-import com.example.activizer.StatsDatabaseHelper
-
-
-
-class ExerciseSelectionActivity : AppCompatActivity() {
-
-    private lateinit var container: LinearLayout
-    private lateinit var dbHelper: StatsDatabaseHelper
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_exercise_selection)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        container = findViewById(R.id.exerciseButtonContainer)
-        dbHelper = StatsDatabaseHelper(this)
-
-        val exerciseNames = dbHelper.getAllExerciseNames()
-        for (name in exerciseNames) {
-            val btn = Button(this).apply {
-                text = name
-                setOnClickListener {
-                    val intent = Intent(this@ExerciseSelectionActivity, ExerciseStatsActivity::class.java)
-                    intent.putExtra("exerciseName", name)
-                    startActivity(intent)
-                }
-            }
-            container.addView(btn)
-        }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return true
-    }
-}
-
-/*
-package com.example.activizer
-
-
-
-import android.content.Intent
-import android.graphics.Color
-import android.os.Bundle
-import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 class ExerciseSelectionActivity : AppCompatActivity() {
 
@@ -68,31 +27,74 @@ class ExerciseSelectionActivity : AppCompatActivity() {
 
         container = findViewById(R.id.exerciseButtonContainer)
 
-        val dummyList = listOf("deneme 1 ", "deneme 2 ", "deneme 3","deneme 4", "deneme 5")
+        fetchExerciseNamesFromServer()
+    }
 
-        for (name in dummyList) {
-            val btn = Button(this).apply {
-                text = name
-                setTextColor(Color.WHITE)
-                textSize = 16f
-                background = ContextCompat.getDrawable(
-                    this@ExerciseSelectionActivity,
-                    R.drawable.rounded_button
-                )
-                val params = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(32, 24, 32, 24)
-                layoutParams = params
+    private fun fetchExerciseNamesFromServer() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val url = URL("http://${ServerAddresses.DatabaseAddress}/user/user-stats")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doInput = true
 
-                setOnClickListener {
-                    val intent = Intent(this@ExerciseSelectionActivity, ExerciseStatsActivity::class.java)
-                    intent.putExtra("exerciseName", name)
-                    startActivity(intent)
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+                val json = JSONObject(response)
+
+                if (json.getString("status") != "success") {
+                    throw Exception("Server response error: ${json.getString("message")}")
+                }
+
+                val statsArray = json.getJSONArray("message")
+                val namesSet = mutableSetOf<String>()
+                for (i in 0 until statsArray.length()) {
+                    val statRow = statsArray.getJSONArray(i)
+                    val exerciseName = statRow.getString(3) // 4. sütun: exerciseName
+                    namesSet.add(exerciseName)
+                }
+
+                withContext(Dispatchers.Main) {
+                    if (namesSet.isEmpty()) {
+                        Toast.makeText(this@ExerciseSelectionActivity, "Egzersiz bulunamadı!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        for (name in namesSet) {
+                            val btn = Button(this@ExerciseSelectionActivity).apply {
+                                text = name
+                                background = ContextCompat.getDrawable(this@ExerciseSelectionActivity, R.drawable.rounded_button)
+                                setTextColor(ContextCompat.getColor(this@ExerciseSelectionActivity, android.R.color.white))
+                                textSize = 18f
+                                setPadding(24, 16, 24, 16)
+
+                                setOnClickListener {
+                                    val intent = Intent(this@ExerciseSelectionActivity, ExerciseStatsActivity::class.java)
+                                    intent.putExtra("exerciseName", name)
+                                    startActivity(intent)
+                                }
+
+                                layoutParams = LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                ).apply {
+                                    setMargins(0, 16, 0, 0)
+                                }
+                            }
+
+                            container.addView(btn)
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e("ExerciseSelection", "Hata oluştu: ${e.message}")
+                    Toast.makeText(
+                        this@ExerciseSelectionActivity,
+                        "Egzersiz listesi alınamadı: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
-            container.addView(btn)
         }
     }
 
@@ -101,4 +103,3 @@ class ExerciseSelectionActivity : AppCompatActivity() {
         return true
     }
 }
-*/

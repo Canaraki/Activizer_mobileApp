@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
@@ -12,6 +13,11 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import kotlinx.coroutines.*
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,7 +40,6 @@ class ExerciseStatsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_stats)
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         selectedExercise = intent.getStringExtra("exerciseName") ?: "Unknown"
@@ -50,9 +55,6 @@ class ExerciseStatsActivity : AppCompatActivity() {
 
         exerciseTitle.text = selectedExercise
 
-        val dbHelper = StatsDatabaseHelper(this)
-        allStats = dbHelper.getStatsForExercise(selectedExercise)
-
         val calendar = Calendar.getInstance()
         endDate = calendar.time
         calendar.add(Calendar.DAY_OF_MONTH, -30)
@@ -61,7 +63,48 @@ class ExerciseStatsActivity : AppCompatActivity() {
         startDateButton.setOnClickListener { showDatePicker(true) }
         endDateButton.setOnClickListener { showDatePicker(false) }
 
-        updateUI()
+        fetchDataFromServer()
+    }
+
+    private fun fetchDataFromServer() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val url = URL("http://${ServerAddresses.DatabaseAddress}/user/user-stats")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doInput = true
+
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+
+                val statsList = mutableListOf<ExerciseStats>()
+                val json = JSONObject(response)
+                val statsArray = json.getJSONArray("message")
+
+                for (i in 0 until statsArray.length()) {
+                    val item = statsArray.getJSONArray(i)
+                    val username = item.getString(0)
+                    val score = item.getDouble(1).toFloat()
+                    val date = item.getString(2)
+                    val exerciseName = item.getString(3)
+
+                    if (exerciseName == selectedExercise) {
+                        statsList.add(ExerciseStats(exerciseName, date, duration = 0, score = score))
+                    }
+                }
+
+                allStats = statsList
+
+                withContext(Dispatchers.Main) {
+                    updateUI()
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ExerciseStatsActivity, "Veri çekilemedi: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun showDatePicker(isStart: Boolean) {
@@ -81,22 +124,20 @@ class ExerciseStatsActivity : AppCompatActivity() {
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
         val filtered = allStats.filter {
-            val date = sdf.parse(it.date)
+            val date = sdf.parse(it.exerciseDate)
             date != null && !date.before(startDate) && !date.after(endDate)
-        }.sortedBy { it.date }
+        }.sortedBy { it.exerciseDate }
 
-        // En son yapılan egzersizi göster
         val last = filtered.lastOrNull()
         last?.let {
             lastExerciseHeader.text = "Last Exercise"
             lastExerciseDuration.text = "Duration: ${it.duration} sec"
-            lastExerciseMsg.text = "MSG (sec/step): %.2f".format(it.msg)
+            lastExerciseMsg.text = "MSG (sec/step): %.2f".format(it.score)
         }
 
-        // Bar chart verileri
-        val labels = filtered.map { it.date }
+        val labels = filtered.map { it.exerciseDate }
         val entries = filtered.mapIndexed { index, stat ->
-            BarEntry(index.toFloat(), stat.msg)
+            BarEntry(index.toFloat(), stat.score)
         }
 
         val dataSet = BarDataSet(entries, "MSG (sec/step)")
@@ -115,8 +156,7 @@ class ExerciseStatsActivity : AppCompatActivity() {
         barChart.description.text = "Exercises Over Time"
         barChart.invalidate()
 
-        // Ortalama MSG
-        val avgMsg = filtered.map { it.msg }.average()
+        val avgMsg = filtered.map { it.score }.average()
         averageMsgText.text = "Average MSG: %.2f sec/step".format(avgMsg)
     }
 
