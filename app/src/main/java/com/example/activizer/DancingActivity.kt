@@ -8,6 +8,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Color
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 class DancingActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +72,37 @@ class DancingActivity : AppCompatActivity(){
                     this.layoutParams = layoutParams
 
                     setOnClickListener {
-                        Toast.makeText(this@DancingActivity, "Selected: $routine", Toast.LENGTH_SHORT).show()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val BASE_URL = "http://${ServerAddresses.RaspberryPiAddress}"
+                            try {
+                                val url = URL("$BASE_URL/exercise-selection")
+                                val connection = url.openConnection() as HttpURLConnection
+                                connection.requestMethod = "POST"
+                                connection.setRequestProperty("Content-Type", "application/json")
+                                connection.doOutput = true
+                                val payload = """
+                                    {
+                                      "name": "$routine"
+                                    }
+                                """.trimIndent()
+                                connection.outputStream.use { os ->
+                                    os.write(payload.toByteArray())
+                                    os.flush()
+                                }
+                                val response = if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                                    BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
+                                } else {
+                                    BufferedReader(InputStreamReader(connection.errorStream)).use { it.readText() }
+                                }
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@DancingActivity, "Server: $response", Toast.LENGTH_LONG).show()
+                                }
+                            } catch (e: Exception) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@DancingActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
                     }
                 }
 
