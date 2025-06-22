@@ -21,6 +21,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.Intent
+import android.widget.ImageButton
+
 
 class ExerciseStatsActivity : AppCompatActivity() {
 
@@ -55,6 +58,25 @@ class ExerciseStatsActivity : AppCompatActivity() {
         endDateButton = findViewById(R.id.endDateButton)
 
         exerciseTitle.text = selectedExercise
+
+        val statsBtn = findViewById<ImageButton>(R.id.stats)
+        val homeBtn = findViewById<ImageButton>(R.id.jojo)
+        val profileBtn = findViewById<ImageButton>(R.id.bizarre)
+
+        statsBtn.setOnClickListener {
+            val intent = Intent(this, ExerciseSelectionActivity::class.java)
+            startActivity(intent)
+        }
+
+        homeBtn.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        profileBtn.setOnClickListener {
+            val intent = Intent(this, UserDetails::class.java)
+            startActivity(intent)
+        }
 
         val calendar = Calendar.getInstance()
         endDate = calendar.time

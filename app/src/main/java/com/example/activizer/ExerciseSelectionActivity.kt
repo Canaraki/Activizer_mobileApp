@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,25 @@ class ExerciseSelectionActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         container = findViewById(R.id.exerciseButtonContainer)
+
+        val statsBtn = findViewById<ImageButton>(R.id.stats)
+        val homeBtn = findViewById<ImageButton>(R.id.jojo)
+        val userbtn = findViewById<ImageButton>(R.id.bizarre)
+
+        statsBtn.setOnClickListener {
+            val intent = Intent(this, ExerciseSelectionActivity::class.java)
+            startActivity(intent)
+        }
+
+        homeBtn.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        userbtn.setOnClickListener {
+            val intent = Intent(this, UserDetails::class.java)
+            startActivity(intent)
+        }
 
         fetchExerciseNamesFromServer()
     }
