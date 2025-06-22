@@ -290,12 +290,23 @@ class UserDetails : AppCompatActivity() {
                 val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
                 connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/json")
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
                 connection.doOutput = true
-                connection.connect()
+                // Send an empty JSON body to ensure the POST is sent
+                connection.outputStream.use { os ->
+                    os.write("{}".toByteArray())
+                    os.flush()
+                }
+                // Read the response to ensure the request completes
+                val responseCode = connection.responseCode
+                val ignoredLogoutResponse = if (responseCode == java.net.HttpURLConnection.HTTP_NO_CONTENT) {
+                    // No content expected
+                    null
+                } else {
+                    java.io.BufferedReader(java.io.InputStreamReader(connection.inputStream)).use { it.readText() }
+                }
             } catch (_: Exception) {}
             withContext(Dispatchers.Main) {
+                GlobalUser.username = null
                 val intent = Intent(this@UserDetails, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
