@@ -64,7 +64,7 @@ class DancingActivity : AppCompatActivity(){
                 val routine = innerArray.getString(0)
 
                 val btn = Button(this).apply {
-                    text = routine
+                    text = routine.split(" ").joinToString(" ") { it.replaceFirstChar { c -> c.uppercaseChar() } }
                     textSize = 18f
                     setTextColor(Color.WHITE)
                     background = ContextCompat.getDrawable(this@DancingActivity, R.drawable.rounded_button)
@@ -169,26 +169,23 @@ class DancingActivity : AppCompatActivity(){
                                                 }
 
                                                 withContext(Dispatchers.Main) {
-                                                    Toast.makeText(this@DancingActivity, "Database: $dbResponse", Toast.LENGTH_LONG).show()
                                                     Log.d("tag:exerciseStats", "Database Server Response: $dbResponse")
                                                 }
                                             } catch (e: Exception) {
                                                 withContext(Dispatchers.Main) {
                                                     val errorMessage = "Database server error: ${e.message}"
-                                                    Toast.makeText(this@DancingActivity, errorMessage, Toast.LENGTH_LONG).show()
                                                     Log.e("tag:exerciseStats", errorMessage)
                                                 }
                                             }
                                         }
                                     } catch (e: org.json.JSONException) {
                                         val errorMessage = "Error parsing Pi server response: ${e.message}"
-                                        Toast.makeText(this@DancingActivity, errorMessage, Toast.LENGTH_LONG).show()
                                         Log.e("tag:exerciseStats", errorMessage)
                                     }
                                 }
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
-                                    Toast.makeText(this@DancingActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                                    Log.e("tag:exerciseStats", "Error: ${e.message}")
                                 }
                             }
                         }
@@ -208,7 +205,7 @@ class DancingActivity : AppCompatActivity(){
             }
 
         } catch (e: Exception) {
-            Toast.makeText(this, "Failed to load exercises", Toast.LENGTH_SHORT).show()
+            Log.e("tag:exerciseStats", "Failed to load exercises")
         }
     }
 }
