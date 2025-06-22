@@ -37,7 +37,6 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:padding="12dp"
-        android:background="#F5F5F5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
