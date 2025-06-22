@@ -21,6 +21,9 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.view.View
+import android.graphics.BitmapFactory
+import android.widget.ImageView
 
 class HighTempoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +51,8 @@ class HighTempoActivity : AppCompatActivity() {
         }
 
         val exercisesJson = intent.getStringExtra("exercises")
+
+        val diagramView = findViewById<ImageView>(R.id.exerciseDiagram)
 
         try {
             val container = findViewById<LinearLayout>(R.id.exerciseContainer)
@@ -77,6 +82,18 @@ class HighTempoActivity : AppCompatActivity() {
                     this.layoutParams = layoutParams
 
                     setOnClickListener {
+                        // Show the diagram
+                        val diagramName = "$routine.png"
+                        try {
+                            val assetManager = assets
+                            val inputStream = assetManager.open("exercise-diagrams/$diagramName")
+                            val bitmap = BitmapFactory.decodeStream(inputStream)
+                            diagramView.setImageBitmap(bitmap)
+                            diagramView.visibility = View.VISIBLE
+                            inputStream.close()
+                        } catch (e: Exception) {
+                            diagramView.visibility = View.GONE // Hide if not found
+                        }
                         CoroutineScope(Dispatchers.IO).launch {
                             val BASE_URL = "http://${ServerAddresses.RaspberryPiAddress}"
                             try {
@@ -119,8 +136,8 @@ class HighTempoActivity : AppCompatActivity() {
                                         intent.putExtra("duration", duration)
                                         intent.putExtra("score", stat)
                                         intent.putExtra("steps", interval.toFloatArray())
+                                        diagramView.visibility = View.GONE
                                         startActivity(intent)
-
 
                                         // Send stats to the database server
                                         CoroutineScope(Dispatchers.IO).launch {
