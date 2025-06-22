@@ -76,12 +76,19 @@ class ExerciseStatsActivity : AppCompatActivity() {
                 connection.setRequestProperty("Content-Type", "application/json")
                 connection.doOutput = true
 
+                val calendar = Calendar.getInstance()
+                val endCal = calendar.clone() as Calendar
+                endCal.add(Calendar.DAY_OF_MONTH, 1)
+                val startCal = calendar.clone() as Calendar
+                startCal.add(Calendar.DAY_OF_MONTH, -30)
+
                 val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                 val requestJson = JSONObject().apply {
-                    put("dateFrom", sdf.format(startDate))
-                    put("dateUntil", sdf.format(endDate))
+                    put("dateFrom", sdf.format(startCal.time))
+                    put("dateUntil", sdf.format(endCal.time))
+                    put("exerciseName", selectedExercise)
                 }
-                Log.d("fetchData", "Request JSON: ${requestJson.toString()}")
+                Log.d("fetchData", "Request JSON: "+requestJson.toString())
 
                 val outputBytes = requestJson.toString().toByteArray(Charsets.UTF_8)
                 connection.outputStream.write(outputBytes)
