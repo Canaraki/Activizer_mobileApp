@@ -13,6 +13,41 @@
         android:gravity="center_horizontal">
 
         <!-- Buttons will be added dynamically -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="16dp">
+
+            <ImageButton
+                android:id="@+id/stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00FFFFFF"
+                android:contentDescription="@android:string/untitled"
+                android:src="@drawable/stats" />
+
+            <ImageButton
+                android:id="@+id/jojo"
+                android:layout_width="103dp"
+                android:layout_height="97dp"
+                android:background="#00FFFFFF"
+                android:contentDescription="@android:string/untitled"
+                android:scaleType="fitCenter"
+                android:src="@drawable/home2"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <ImageButton
+                android:id="@+id/bizarre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00FFFFFF"
+                android:contentDescription="@android:string/untitled"
+                android:src="@drawable/use_xs" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
