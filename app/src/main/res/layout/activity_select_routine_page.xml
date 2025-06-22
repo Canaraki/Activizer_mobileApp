@@ -50,6 +50,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/use_xs" />
 
+    <View
+        android:id="@+id/topColorBar"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:background="#6200EE"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/RoutineList"
         android:layout_width="360dp"
@@ -57,8 +66,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="64dp"
         android:layout_marginEnd="8dp"
-        android:background="#8BC34A"
-        android:text="Available Routines:"
+        android:background="#6200EE"
+        android:textColor="#EFEFEF"
+        android:text="Available Routines"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         android:textSize="34sp"
