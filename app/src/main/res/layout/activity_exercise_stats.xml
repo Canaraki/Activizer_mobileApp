@@ -85,5 +85,39 @@
             android:textStyle="italic"
             android:layout_marginTop="12dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="16dp">
+
+            <ImageButton
+                android:background="@color/white"
+                android:id="@+id/stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@android:string/untitled"
+                 />
+
+            <ImageButton
+                android:background="@color/white"
+                android:id="@+id/jojo"
+                android:layout_width="103dp"
+                android:layout_height="97dp"
+                android:contentDescription="@android:string/untitled"
+                android:scaleType="fitCenter"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <ImageButton
+                android:background="@color/white"
+                android:id="@+id/bizarre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@android:string/untitled"
+                />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
