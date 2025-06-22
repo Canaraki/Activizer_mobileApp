@@ -11,7 +11,7 @@
     <View
         android:id="@+id/topColorBar"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="160dp"
         android:background="#6200EE"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,31 +62,32 @@
 
     <TextView
         android:id="@+id/User"
-        android:layout_width="360dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="80dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello"
         android:textColor="@color/white"
         android:backgroundTint="#8BC34A"
         android:fontFamily="@font/poppins_bold"
-        android:foregroundTint="#FFFFFF"
         android:textAlignment="center"
         android:paddingTop="20dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Hello"
-        android:text="Hello"/>
+        app:layout_constraintTop_toTopOf="@+id/topColorBar"
+        app:layout_constraintBottom_toBottomOf="@+id/topColorBar"
+        app:layout_constraintStart_toStartOf="@+id/topColorBar"
+        app:layout_constraintEnd_toEndOf="@+id/topColorBar"
+        tools:text="Hello" />
+
 
     <FrameLayout
         android:id="@+id/info_frame"
         android:layout_width="297dp"
         android:layout_height="291dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="124dp"
         android:background="#8BC34A"
+        app:layout_constraintTop_toBottomOf="@+id/topColorBar"
+        app:layout_constraintBottom_toTopOf="@+id/stats2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5">
 
         <TextView
             android:id="@+id/weight"

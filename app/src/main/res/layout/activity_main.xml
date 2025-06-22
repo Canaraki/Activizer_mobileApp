@@ -65,7 +65,7 @@
     <View
         android:id="@+id/topColorBar"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="160dp"
         android:background="#6200EE"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
