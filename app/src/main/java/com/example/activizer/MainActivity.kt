@@ -61,8 +61,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             statsButton.setOnClickListener {
-                Toast.makeText(this, "İstatistik butonuna basıldı", Toast.LENGTH_SHORT).show()
-
                 val intent = Intent(this, ExerciseSelectionActivity::class.java)
                 startActivity(intent)
             }
@@ -151,11 +149,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Show response in UI thread
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Activity request sent: $activityType\nExercises: $exercisesResponse\nSelection: $selectionResponse",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.d("ActivityRequest", "Activity request sent: $activityType\nExercises: $exercisesResponse\nSelection: $selectionResponse")
                     if (activityType == "stepping") {
                         Log.d("ResponseDebug", "Exercises JSON: $exercisesResponse")
                         val intent = Intent(this@MainActivity, LightSteppingActivity::class.java)
