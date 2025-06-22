@@ -39,6 +39,8 @@ class UserDetails : AppCompatActivity() {
 
     private var isEditMode = false
 
+    private lateinit var logoutButton: com.google.android.material.button.MaterialButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -134,6 +136,11 @@ class UserDetails : AppCompatActivity() {
 
         editButton.setOnClickListener {
             toggleEditMode(username)
+        }
+
+        logoutButton = findViewById(R.id.logoutButton)
+        logoutButton.setOnClickListener {
+            performLogout()
         }
 
         // Fetch user data from server
@@ -272,6 +279,28 @@ class UserDetails : AppCompatActivity() {
             genderEditText.visibility = android.view.View.GONE
             weightEditText.visibility = android.view.View.GONE
             heightEditText.visibility = android.view.View.GONE
+        }
+    }
+
+    private fun performLogout() {
+        val BASE_URL = "http://${ServerAddresses.DatabaseAddress}"
+        val url = "$BASE_URL/logout"
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+                connection.doOutput = true
+                connection.connect()
+            } catch (_: Exception) {}
+            withContext(Dispatchers.Main) {
+                val intent = Intent(this@UserDetails, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
         }
     }
 }
